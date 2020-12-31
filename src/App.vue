@@ -1,26 +1,41 @@
-<template>
-  <img alt="Vue logo" src="./assets/logo.png" />
-  <HelloWorld msg="Welcome to Your Vue.js App" />
-</template>
-
 <script>
-import HelloWorld from "./components/HelloWorld.vue";
+import { onMounted } from 'vue'
+import { mutations, actions, state } from './store'
+import { starProvider } from './store/star'
+
+// components
+import Form from './components/Form'
 
 export default {
-  name: "App",
+  name: 'App',
   components: {
-    HelloWorld
+    Form
+  },
+  setup() {
+    starProvider(0) // provide the initial value to all child
+    const { name } = state()
+
+    function changeStatus() {
+      mutations.setStatus()
+      console.log(status)
+    }
+
+    // mounted
+    onMounted(() => {
+      actions.getReview()
+    })
+
+    return { changeStatus, name }
   }
-};
+}
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
+<template>
+  <div class="m-0 text-white flex">
+    <nav class=" bg-red-50 w-96 h-screen">
+      <Form />
+    </nav>
+  </div>
+</template>
+
+<style></style>
