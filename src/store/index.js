@@ -12,6 +12,31 @@ const state = () => {
   return { ...toRefs(review), name, stars }
 }
 
+const formSetup = {
+  // formContext: Symbol(),
+  // formProviders: starValue => {
+  //   const form = reactive({
+  //     name: '',
+  //     review_comment: '',
+  //     review_star: starValue,
+  //     images: []
+  //   })
+  //   function updateStar(star) {
+  //     form.review_star = form.review_star === star ? star - 1 : star
+  //     console.log(star)
+  //     console.log(form.review_star)
+  //   }
+  //   provide(formContext, {
+  //     form,
+  //     updateStar
+  //   })
+  // },
+  // formContexts: () => {
+  //   const context = inject(formContext)
+  //   return context
+  // }
+}
+
 const mutations = {
   updateStars(star) {
     const { stars } = state()
@@ -35,9 +60,8 @@ const actions = {
 
   async postReview(payload) {
     try {
-      const rev = await review.post(payload)
-      console.log(rev.data)
-      // console.log(payload)
+      // const rev = await review.post(payload)
+      console.log(payload)
     } catch (err) {
       console.error(err)
     }
@@ -50,4 +74,4 @@ const getters = {
   })
 }
 
-export { state, getters, mutations, actions }
+export { state, getters, mutations, actions, formSetup }

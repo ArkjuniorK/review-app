@@ -1,7 +1,7 @@
 <script>
 import { onMounted } from 'vue'
 import { mutations, actions, state } from './store'
-import { starProvider } from './store/star'
+import { formProviders } from './store/form'
 
 // components
 import Form from './components/Form'
@@ -12,7 +12,7 @@ export default {
     Form
   },
   setup() {
-    starProvider(0) // provide the initial value to all child
+    formProviders(0) // init the star number
     const { name } = state()
 
     function changeStatus() {
@@ -32,9 +32,12 @@ export default {
 
 <template>
   <div class="m-0 text-white flex">
-    <nav class=" bg-red-50 w-96 h-screen">
-      <Form />
-    </nav>
+    <aside class="flex-initial sticky top-0 bg-red-50 h-screen w-96">
+      <Form class="" />
+    </aside>
+    <main class="flex-1 bg-red-100 relative">
+      Hello
+    </main>
   </div>
 </template>
 

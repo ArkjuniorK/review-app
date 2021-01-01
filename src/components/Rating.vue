@@ -1,5 +1,5 @@
 <script>
-import { starContext } from '../store/star'
+import { formContexts } from '../store/form'
 
 export default {
   name: 'Rating',
@@ -10,48 +10,18 @@ export default {
     readonly: {
       type: Boolean,
       required: false,
-      default: false,
+      default: false
     },
     color: {
       type: String,
-      default: 'text-red-500',
-    },
-  },
-
-  /* --------------------------------
-     The problem with using this syntax was
-     It actually mutate the props via assignment on data 
-     --------------------------------- */
-  // data() {
-  //   return {
-  //     stars: this.grade,
-  //   }
-  // },
-  // methods: {
-  //   rate(star) {
-  //     if (typeof star === 'number' && star <= this.max && star >= 0) {
-  //       this.stars = this.stars === star ? star - 1 : star
-  //       console.log(this.stars)
-  //     }
-  //   },
-  // },
-
-  /* --------------------------------
-      using setup() would be easy since 
-      it could use provide method 
-      so we only mutate provider data
-      -------------------------------- */
-  setup: (props) => {
-    const { update } = starContext()
-
-    function rates(star) {
-      if (typeof star === 'number' && star <= props.max && star >= 0) {
-        update(star)
-      }
+      default: 'text-red-500'
     }
-
-    return { rates }
   },
+  setup: () => {
+    const { updateStar } = formContexts()
+
+    return { updateStar }
+  }
 }
 </script>
 
@@ -61,7 +31,7 @@ export default {
       <li
         v-for="star in max"
         :key="star.stars"
-        @click="readonly ? null : rates(star)"
+        @click="readonly ? null : updateStar(star, max)"
         class=" cursor-pointer inline-flex text-2xl"
         :class="color"
       >

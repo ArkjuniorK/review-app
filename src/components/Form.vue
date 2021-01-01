@@ -1,7 +1,6 @@
 <script>
-import { onMounted, toRefs, reactive, ref, toRaw } from 'vue'
-import { starContext } from '../store/star'
-import { actions } from '../store/'
+import { toRefs, ref } from 'vue'
+import { formContexts } from '../store/form'
 import Rating from './Rating'
 
 export default {
@@ -10,72 +9,25 @@ export default {
     Rating
   },
   setup() {
-    const { stars } = starContext()
-    const formTag = ref(null)
-    const upload = ref(null) // use ref to replave this.$refs
+    const formTag = ref(null),
+      upload = ref(null), // use ref to replave this.$refs
+      alert = ref(false) // for images wrapper
 
-    // alert
-    const alert = ref(false)
+    // use form and postReview from the formContexts
+    const { form, postForm } = formContexts()
 
-    // form data with reactive function because it take couples of properties
-    const form = reactive({
-      name: '',
-      review_comment: '',
-      review_star: stars.value,
-      image: null
-    })
-
-    // empty array for viewing images
-    const images = ref([])
-
-    async function selectFile(event) {
-      // select the files
-      const files = event.target.files
-
+    function selectFile(event) {
+      const files = event.target.files // select the files
       // return empty array if files.length > 4
-      // FileList object that cannot modify
-      form.image = files.length > 4 ? (alert.value = true) : files
-
-      // turn form.image to array
-      // make it viewable with turn the image to b64
-      images.value = await Array.from(form.image).map(image => {
-        let value = {} // init empty object that would be returned at the end
-
-        const reader = new FileReader()
-        reader.addEventListener('load', () => (value.b64 = reader.result))
-        reader.readAsDataURL(image)
-        value.name = image.name
-
-        return value
-      })
-
-      console.log(images.value)
+      form.images = files.length > 4 ? (alert.value = true) : Array.from(files)
     }
-
-    // create the form-data manually
-    const rawForm = toRaw(form)
-    const formData = new FormData()
-
-    function addReview() {
-      formData.append('name', rawForm.name)
-      formData.append('review_comment', rawForm.review_comment)
-      formData.append('review_star', rawForm.review_star)
-      formData.append('images', rawForm.image)
-
-      actions.postReview(formData)
-    }
-
-    onMounted(() => {})
 
     return {
-      name,
-      stars,
       selectFile,
       upload,
-      addReview,
       formTag,
-      images,
       alert,
+      postForm,
       ...toRefs(form)
     }
   }
@@ -84,7 +36,7 @@ export default {
 
 <template>
   <form
-    @submit.prevent="addReview"
+    @submit.prevent="postForm"
     enctype="multipart/form-data"
     method="post"
     ref="formTag"
@@ -100,10 +52,10 @@ export default {
         Review
       </h1>
       <span class="flex-1 text-5xl font-bold font-lato text-red-200">
-        {{ stars }}
+        {{ review_star }}
       </span>
       <Rating
-        :grade="stars"
+        :grade="review_star"
         :max="5"
         class="rounded-md flex-1 my-auto"
         color="text-red-200"
@@ -153,14 +105,10 @@ export default {
           Peringatan: Max 4 Gambar!
         </h3>
 
-        <div
-          v-if="images !== null"
-          class="w-full space-y-1 mt-3 text-left grid grid-cols-2"
-        >
-          <div v-for="img in images" :key="img.name" class="block">
-            <img :src="img.b64" loading="lazy" :alt="img.name" />
-            <span> + {{ img.name }} </span>
-          </div>
+        <div v-if="images !== null" class="w-full space-y-1 mt-3 text-left ">
+          <span v-for="img in images" :key="img.name" class="block">
+            + {{ img.name }}
+          </span>
         </div>
       </div>
     </div>
