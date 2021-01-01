@@ -14,52 +14,47 @@ export default {
     const formTag = ref(null)
     const upload = ref(null) // use ref to replave this.$refs
 
+    // alert
+    const alert = ref(false)
+
     // form data with reactive function because it take couples of properties
     const form = reactive({
       name: '',
       review_comment: '',
       review_star: stars.value,
-      image: []
+      image: null
     })
+
+    // empty array for viewing images
+    const images = ref([])
+
+    async function selectFile(event) {
+      // select the files
+      const files = event.target.files
+
+      // return empty array if files.length > 4
+      // FileList object that cannot modify
+      form.image = files.length > 4 ? (alert.value = true) : files
+
+      // turn form.image to array
+      // make it viewable with turn the image to b64
+      images.value = await Array.from(form.image).map(image => {
+        let value = {} // init empty object that would be returned at the end
+
+        const reader = new FileReader()
+        reader.addEventListener('load', () => (value.b64 = reader.result))
+        reader.readAsDataURL(image)
+        value.name = image.name
+
+        return value
+      })
+
+      console.log(images.value)
+    }
 
     // create the form-data manually
     const rawForm = toRaw(form)
     const formData = new FormData()
-
-    // object for required image with couples of properties
-    // const image = reactive({
-    //   originalName: '',
-    //   size: null,
-    //   b64: ''
-    // })
-
-    function selectFile(event) {
-      // select the files
-      const files = event.target.files
-      if (files.length > 4) return null
-      form.image = files
-
-      // console.log(files)
-
-      // add to image value
-      // image.originalName = files[0].name
-      // image.size = files[0].size
-
-      /*  -------------------------------- 
-        Because the server will turn the image to base64
-        it actually not required to turn the image from the client
-      -------------------------------- */
-
-      // turn image to base64
-      // const reader = new FileReader()
-      // reader.addEventListener('load', () => {
-      //   image.b64 = reader.result
-      // })
-      // reader.readAsDataURL(files[0])
-
-      // add the image to image array
-      // form.image.push(image)
-    }
 
     function addReview() {
       formData.append('name', rawForm.name)
@@ -68,10 +63,6 @@ export default {
       formData.append('images', rawForm.image)
 
       actions.postReview(formData)
-      // formData.values().forEach(value => console.log(value))
-      // for (var value of formData.values()) {
-      //   console.log(value)
-      // }
     }
 
     onMounted(() => {})
@@ -83,6 +74,8 @@ export default {
       upload,
       addReview,
       formTag,
+      images,
+      alert,
       ...toRefs(form)
     }
   }
@@ -123,17 +116,6 @@ export default {
           placeholder="Nama Kamu "
         />
 
-        <!-- use span to make the textbox become autoscroll -->
-        <!-- span cannot use v-model -->
-        <!-- <span
-          role="textbox"
-          contenteditable
-          name="review"
-          id="review"
-          placeholder="Review Kamu"
-          class="w-full bg-light border-red-200 border p-3 resize-y block overflow-hidden h-20 text-red-200"
-        ></span> -->
-
         <textarea
           v-model="review_comment"
           role="textbox"
@@ -151,11 +133,11 @@ export default {
           class="hidden"
           type="file"
           accept="image/*"
-          multiple
           name="files"
           id="file"
           @change="selectFile"
           ref="upload"
+          multiple
         />
 
         <!-- access the input via $refs -->
@@ -167,11 +149,18 @@ export default {
           UPLOAD IMAGES
         </button>
 
-        <!-- iterate the image -->
-        <div class="w-full space-y-1 mt-3 text-left">
-          <span v-for="img in image" :key="img.name" class="block">
+        <h3 v-if="alert" class="mt-4 font-raleway">
+          Peringatan: Max 4 Gambar!
+        </h3>
+
+        <div
+          v-if="images !== null"
+          class="w-full space-y-1 mt-3 text-left grid grid-cols-2"
+        >
+          <div v-for="img in images" :key="img.name" class="block">
+            <img :src="img.b64" loading="lazy" :alt="img.name" />
             <span> + {{ img.name }} </span>
-          </span>
+          </div>
         </div>
       </div>
     </div>
