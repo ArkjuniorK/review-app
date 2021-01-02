@@ -1,7 +1,7 @@
 <script>
 import { inject, ref } from 'vue'
 // import { inject } from 'vue'
-import { reviewContext } from '../store/form'
+import { reviewContext } from '../store'
 
 import Rating from './Rating'
 
@@ -70,9 +70,17 @@ export default {
       </div>
       <div id="bottom" class="mt-2">
         <p>{{ comment }}</p>
-        <div class="grid grid-cols-2">
-          <div v-for="image in images" :key="image.name">
-            <img :src="image.b64" :alt="image.name" />
+        <div v-if="images.length > 0" class="grid grid-cols-2  my-2">
+          <div
+            v-for="image in images"
+            :key="image.name"
+            class="w-full rounded-xl overflow-hidden h-36"
+          >
+            <img
+              :src="['data:image/png;base64', image.b64]"
+              :alt="image.name"
+              class=" object-cover h-full w-full"
+            />
           </div>
         </div>
       </div>

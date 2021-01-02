@@ -1,52 +1,103 @@
-import { reactive, computed, toRefs, ref } from 'vue'
+import { reactive, ref, provide, readonly, toRaw } from 'vue'
+import * as _ from 'lodash'
 import review from '../services'
 
-// use reactive from vue to create vuex pattern
-const state = () => {
-  const review = reactive({
-    review: []
+export const formContext = Symbol('Only Form')
+export const reviewContext = Symbol('Only Reviews')
+
+const store = () => {
+  /* ---- state ---- */
+  const form = reactive({
+    name: '',
+    review_comment: '',
+    review_star: 0,
+    images: []
+  })
+  const reviews = ref([])
+  const readreviews = readonly(reviews) // immutable
+  const response = reactive({
+    status: false,
+    success: '',
+    error: ''
   })
 
-  const name = ref('Change Me')
-  const stars = ref(2)
-  return { ...toRefs(review), name, stars }
-}
-
-const mutations = {
-  updateStars(star) {
-    const { stars } = state()
-    console.log(star)
-    console.log(stars)
-
-    stars.value = stars.value === star ? star - 1 : star
+  /* ------ actions ------ */
+  function updateResponse(type, msg) {
+    response.status = true
+    response[type] = msg
+    setTimeout(() => {
+      response.status = false
+      response[type] = ''
+    }, 2000)
   }
-}
 
-const actions = {
-  async getReview() {
-    try {
-      // get the review using index services
-      const reviews = await review.index()
-      console.log(reviews.data.data)
-    } catch (err) {
-      console.error(err)
-    }
-  },
-
-  async postReview(payload) {
-    try {
-      // const rev = await review.post(payload)
-      console.log(payload)
-    } catch (err) {
-      console.error(err)
+  // update the star value
+  function updateStar(star, max) {
+    if (typeof star === 'number' && star <= max && star >= 0) {
+      form.review_star = form.review_star === star ? star - 1 : star
     }
   }
-}
 
-const getters = {
-  welcome: computed(() => {
-    return state.status ? 'Hello World' : 'Hello Bitch'
+  // post the form
+  // turn the form into raw object
+  // then append the object into the formData
+  // so it could be submitted on server
+  async function postForm() {
+    try {
+      const rawForm = toRaw(form),
+        formData = new FormData()
+
+      formData.append('name', rawForm.name)
+      formData.append('review_comment', rawForm.review_comment)
+      formData.append('review_star', rawForm.review_star)
+      rawForm.images.forEach(image => formData.append('images', image))
+
+      await review.post(formData)
+      updateResponse('success', 'Form berhasil ditambahkan')
+      await getReviews()
+    } catch (err) {
+      updateResponse('error', 'Form berhasil ditambahkan')
+    }
+  }
+
+  // get all reviews on mounted
+  async function getReviews() {
+    try {
+      const req = await review.index()
+      reviews.value = req.data.data
+      console.log(req.data.data)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  // delete review based on 'id'
+  // use lodash to temporaly remove the selected review
+  // from the array
+  async function deleteReview(id) {
+    try {
+      await review.remove(id)
+      _.remove(reviews.value, review => review._id === id)
+      updateResponse('success', 'Review berhasil dihapus')
+    } catch (err) {
+      updateResponse('error', 'Review gagal dihapus')
+    }
+  }
+
+  /* provide enable access through all components */
+  provide(formContext, {
+    form,
+    updateStar,
+    postForm
   })
+
+  provide(reviewContext, {
+    readreviews,
+    getReviews,
+    deleteReview
+  })
+
+  return { readreviews, getReviews, response }
 }
 
-export { state, getters, mutations, actions }
+export default store

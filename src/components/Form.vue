@@ -1,6 +1,6 @@
 <script>
-import { toRefs, ref } from 'vue'
-import { formContexts } from '../store/form'
+import { toRefs, ref, inject } from 'vue'
+import { formContext } from '../store'
 import Rating from './Rating'
 
 export default {
@@ -11,9 +11,11 @@ export default {
   setup() {
     const formTag = ref(null),
       upload = ref(null), // use ref to replave this.$refs
-      alert = ref(false) // for images wrapper
+      alert = ref(false), // for images wrapper
+      loading = ref(false)
 
     // use form and postReview from the formContexts
+    const formContexts = () => inject(formContext)
     const { form, postForm } = formContexts()
 
     function selectFile(event) {
@@ -22,12 +24,19 @@ export default {
       form.images = files.length > 4 ? (alert.value = true) : Array.from(files)
     }
 
+    async function postReview() {
+      loading.value = true
+      await postForm()
+      loading.value = false
+    }
+
     return {
       selectFile,
       upload,
       formTag,
       alert,
-      postForm,
+      postReview,
+      loading,
       ...toRefs(form)
     }
   }
@@ -36,7 +45,7 @@ export default {
 
 <template>
   <form
-    @submit.prevent="postForm"
+    @submit.prevent="postReview"
     enctype="multipart/form-data"
     method="post"
     ref="formTag"
@@ -118,7 +127,11 @@ export default {
       type="submit"
       class="py-3 bg-red-200 absolute bottom-0 right-0 w-full  left-0 text-light font-bold font-raleway"
     >
-      POST
+      <i
+        v-if="loading"
+        class="im im-rocket animate-bounce origin-center text-sm"
+      ></i>
+      <span v-else>POST</span>
     </button>
   </form>
 </template>

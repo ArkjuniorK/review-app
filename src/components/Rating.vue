@@ -1,5 +1,6 @@
 <script>
-import { formContexts } from '../store/form'
+import { inject } from 'vue'
+import { formContext } from '../store'
 
 export default {
   name: 'Rating',
@@ -22,6 +23,7 @@ export default {
     }
   },
   setup: () => {
+    const formContexts = () => inject(formContext)
     const { updateStar } = formContexts()
 
     return { updateStar }
