@@ -11,7 +11,7 @@ const review = {
   view: id => Api().get(`review/${id}`), // get one review
   post: payload => Api().post('review', payload), // post review
   patch: payload => Api().patch('review', payload), // update review
-  remove: id => Api().remove(`review/${id}`) // delete review
+  remove: id => Api().delete(`review/${id}`) // delete review
 }
 
 export default review

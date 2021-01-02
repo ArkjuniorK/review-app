@@ -1,13 +1,21 @@
-import { reactive, provide, inject, toRaw } from 'vue'
+import { reactive, ref, provide, inject, readonly, toRaw } from 'vue'
+import * as _ from 'lodash'
 import review from '../services'
 
-const formContext = Symbol()
+const formContext = Symbol('Only Form')
+export const reviewContext = Symbol('Only Reviews')
 
-export const formProviders = starValue => {
+/* TODO ----------------------------  
+
+  Recreate the function into one exported providers
+
+-------------------------------- END TODO*/
+
+export const formProviders = () => {
   const form = reactive({
     name: '',
     review_comment: '',
-    review_star: starValue,
+    review_star: 0,
     images: []
   })
 
@@ -39,9 +47,45 @@ export const formProviders = starValue => {
     updateStar,
     postForm
   })
+
+  return { form, updateStar, postForm }
 }
 
-export const formContexts = () => {
-  const context = inject(formContext)
-  return context
+export const reviewProviders = () => {
+  const reviews = ref([])
+  const readreviews = readonly(reviews) // immutable
+
+  async function getReviews() {
+    try {
+      const req = await review.index()
+      reviews.value = req.data.data
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  async function deleteReview(id) {
+    try {
+      console.log(id)
+      const req = await review.remove(id)
+      console.log(req.data.data)
+
+      // use lodash the item from array temporary
+      // until the component is mounted again
+      _.remove(reviews.value, review => review._id === id)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  provide(reviewContext, {
+    readreviews,
+    getReviews,
+    deleteReview
+  })
+
+  return { readreviews, getReviews }
 }
+
+export const reviewContexts = () => inject(reviewContext)
+export const formContexts = () => inject(formContext)
