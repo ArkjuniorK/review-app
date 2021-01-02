@@ -10,7 +10,7 @@ const review = {
   index: () => Api().get('review'), // get all reviews
   view: id => Api().get(`review/${id}`), // get one review
   post: payload => Api().post('review', payload), // post review
-  patch: payload => Api().patch('review', payload), // update review
+  patch: (id, payload) => Api().patch(`review/${id}`, payload), // update review
   remove: id => Api().delete(`review/${id}`) // delete review
 }
 

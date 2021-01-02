@@ -8,10 +8,12 @@ export const reviewContext = Symbol('Only Reviews')
 const store = () => {
   /* ---- state ---- */
   const form = reactive({
+    id: '',
     name: '',
     review_comment: '',
     review_star: 0,
-    images: []
+    images: [],
+    onEdit: false
   })
   const reviews = ref([])
   const readreviews = readonly(reviews) // immutable
@@ -20,6 +22,9 @@ const store = () => {
     success: '',
     error: ''
   })
+
+  const rawForm = toRaw(form),
+    formData = new FormData()
 
   /* ------ actions ------ */
   function updateResponse(type, msg) {
@@ -42,19 +47,21 @@ const store = () => {
   // turn the form into raw object
   // then append the object into the formData
   // so it could be submitted on server
-  async function postForm() {
+  async function postForm(id) {
     try {
-      const rawForm = toRaw(form),
-        formData = new FormData()
-
+      // post the form
       formData.append('name', rawForm.name)
       formData.append('review_comment', rawForm.review_comment)
       formData.append('review_star', rawForm.review_star)
       rawForm.images.forEach(image => formData.append('images', image))
 
-      await review.post(formData)
-      updateResponse('success', 'Form berhasil ditambahkan')
-      await getReviews()
+      // edited review will trigger the update function instead
+      if (rawForm.onEdit) await updateReview(id, formData)
+      else {
+        await review.post(formData)
+        updateResponse('success', 'Form berhasil ditambahkan')
+      }
+      await getReviews() // get the newest review
     } catch (err) {
       updateResponse('error', 'Form berhasil ditambahkan')
     }
@@ -68,6 +75,38 @@ const store = () => {
       console.log(req.data.data)
     } catch (err) {
       console.log(err)
+    }
+  }
+
+  // get one review and display data on form
+  // not sure if the image could be update
+  async function getReview(id) {
+    try {
+      const req = await review.view(id)
+      const data = req.data.data
+
+      form.id = data._id
+      form.name = data.name
+      form.review_comment = data.review_comment
+      form.review_star = data.review_star
+      form.images = data.image
+      form.onEdit = true
+
+      console.log(rawForm)
+
+      updateResponse('success', 'Review berhasil didapatkan')
+    } catch (err) {
+      updateResponse('error', 'Review gagal didapatkan')
+    }
+  }
+
+  // updateReview
+  async function updateReview(id, form) {
+    try {
+      await review.patch(id, form)
+      updateResponse('success', 'Review berhasil diupdate')
+    } catch (err) {
+      updateResponse('error', 'Review gagal diupdate')
     }
   }
 
@@ -94,6 +133,8 @@ const store = () => {
   provide(reviewContext, {
     readreviews,
     getReviews,
+    getReview,
+    updateReview,
     deleteReview
   })
 

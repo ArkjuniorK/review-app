@@ -55,6 +55,7 @@ export default {
             v-for="review in readreviews"
             :id="review._id"
             :name="review.name"
+            :date="review.updated_at"
             :rating="review.review_star"
             :comment="review.review_comment"
             :images="review.image"

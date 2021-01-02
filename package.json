@@ -10,6 +10,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "moment": "^2.29.1",
     "typeface-lato": "^1.1.13",
     "typeface-open-sans": "^1.1.13",
     "typeface-raleway": "^1.1.13",

@@ -45,7 +45,7 @@ export default {
 
 <template>
   <form
-    @submit.prevent="postReview"
+    @submit.prevent="postReview(id)"
     enctype="multipart/form-data"
     method="post"
     ref="formTag"
@@ -116,7 +116,7 @@ export default {
 
         <div v-if="images !== null" class="w-full space-y-1 mt-3 text-left ">
           <span v-for="img in images" :key="img.name" class="block">
-            + {{ img.name }}
+            + {{ img.name || img.originalName }}
           </span>
         </div>
       </div>
