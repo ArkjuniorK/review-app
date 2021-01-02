@@ -88,8 +88,6 @@ export default {
         ></textarea>
       </div>
 
-      <span v-if="id"> {{ id }} </span>
-
       <div id="img-wrapper" class="mx-6">
         <!-- hide the actual input button and use ref to make it accassible -->
         <input
