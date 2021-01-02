@@ -1,4 +1,5 @@
 {
+  "homepge": "https://arkjuniork.github.io/review-app/",
   "name": "review-app",
   "version": "0.1.0",
   "private": true,
@@ -11,8 +12,8 @@
   "dependencies": {
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "dayjs": "^1.9.8",
     "gh-pages": "^3.1.0",
-    "moment": "^2.29.1",
     "typeface-lato": "^1.1.13",
     "typeface-raleway": "^1.1.13",
     "vue": "^3.0.0"
