@@ -24,9 +24,9 @@ export default {
       form.images = files.length > 4 ? (alert.value = true) : Array.from(files)
     }
 
-    async function postReview() {
+    async function postReview(id) {
       loading.value = true
-      await postForm()
+      await postForm(id)
       loading.value = false
     }
 
@@ -87,6 +87,8 @@ export default {
           class="w-full bg-light border-red-200 border p-3 resize-y block overflow-hidden h-20 text-red-200 placeholder-red-200"
         ></textarea>
       </div>
+
+      <span v-if="id"> {{ id }} </span>
 
       <div id="img-wrapper" class="mx-6">
         <!-- hide the actual input button and use ref to make it accassible -->

@@ -1,7 +1,7 @@
 <script>
-import moment from 'moment'
 import { inject, ref } from 'vue'
 import { reviewContext } from '../store'
+import dayjs from 'dayjs'
 
 import Rating from './Rating'
 
@@ -26,7 +26,7 @@ export default {
     const { deleteReview, getReview } = reviewContexts()
 
     const dates = new Date(props.date),
-      newDate = moment(dates)
+      newDate = dayjs(dates)
         .locale('id')
         .format('dddd, Do MMMM YYYY')
 

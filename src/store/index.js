@@ -1,5 +1,5 @@
 import { reactive, ref, provide, readonly, toRaw } from 'vue'
-import * as _ from 'lodash'
+import remove from 'lodash/remove'
 import review from '../services'
 
 export const formContext = Symbol('Only Form')
@@ -22,9 +22,6 @@ const store = () => {
     success: '',
     error: ''
   })
-
-  const rawForm = toRaw(form),
-    formData = new FormData()
 
   /* ------ actions ------ */
   function updateResponse(type, msg) {
@@ -49,6 +46,8 @@ const store = () => {
   // so it could be submitted on server
   async function postForm(id) {
     try {
+      const rawForm = toRaw(form),
+        formData = new FormData()
       // post the form
       formData.append('name', rawForm.name)
       formData.append('review_comment', rawForm.review_comment)
@@ -56,14 +55,15 @@ const store = () => {
       rawForm.images.forEach(image => formData.append('images', image))
 
       // edited review will trigger the update function instead
-      if (rawForm.onEdit) await updateReview(id, formData)
-      else {
+      if (rawForm.onEdit) {
+        await updateReview(id, formData)
+      } else {
         await review.post(formData)
         updateResponse('success', 'Form berhasil ditambahkan')
       }
       await getReviews() // get the newest review
     } catch (err) {
-      updateResponse('error', 'Form berhasil ditambahkan')
+      updateResponse('error', 'Form gagal ditambahkan')
     }
   }
 
@@ -72,9 +72,8 @@ const store = () => {
     try {
       const req = await review.index()
       reviews.value = req.data.data
-      console.log(req.data.data)
     } catch (err) {
-      console.log(err)
+      updateResponse('error', 'Gagal mendapatkan data')
     }
   }
 
@@ -92,15 +91,14 @@ const store = () => {
       form.images = data.image
       form.onEdit = true
 
-      console.log(rawForm)
-
       updateResponse('success', 'Review berhasil didapatkan')
     } catch (err) {
       updateResponse('error', 'Review gagal didapatkan')
     }
   }
 
-  // updateReview
+  // bug with the backend is when update the review
+  // the image is dissappear
   async function updateReview(id, form) {
     try {
       await review.patch(id, form)
@@ -116,7 +114,7 @@ const store = () => {
   async function deleteReview(id) {
     try {
       await review.remove(id)
-      _.remove(reviews.value, review => review._id === id)
+      remove(reviews.value, review => review._id === id)
       updateResponse('success', 'Review berhasil dihapus')
     } catch (err) {
       updateResponse('error', 'Review gagal dihapus')
