@@ -30,6 +30,15 @@ export default {
       loading.value = false
     }
 
+    function resetForm() {
+      form.id = ''
+      form.name = ''
+      form.review_comment = ''
+      form.review_star = 0
+      form.images = []
+      form.onEdit = false
+    }
+
     return {
       selectFile,
       upload,
@@ -37,6 +46,7 @@ export default {
       alert,
       postReview,
       loading,
+      resetForm,
       ...toRefs(form)
     }
   }
@@ -50,30 +60,30 @@ export default {
     method="post"
     ref="formTag"
     name="form"
-    class="flex flex-col justify-between relative h-full py-4"
+    class="flex flex-col h-full justify-end py-4"
   >
     <!-- top section -->
     <div
       id="top"
       class="text-center inline-block w-full space-y-4 absolute top-0 mt-4"
     >
-      <h1 class="font-raleway text-center font-bold mb-4">
+      <h1 class="font-raleway text-center font-bold mb-4 text-blue-300">
         Review
       </h1>
-      <span class="flex-1 text-5xl font-bold font-lato text-red-200">
+      <span class="flex-1 text-5xl font-bold font-lato text-blue-200">
         {{ review_star }}
       </span>
       <Rating
         :grade="review_star"
         :max="5"
         class="rounded-md flex-1 my-auto"
-        color="text-red-200"
+        color="text-blue-200"
       />
       <div class="mx-6 mb-6 space-y-3">
         <input
           v-model="name"
           type="text"
-          class="border-red-200 bg-light border p-3 w-full placeholder-red-200 font-raleway font-semibold text-red-200"
+          class="border-blue-100 bg-light border p-3 w-full placeholder-blue-200 font-raleway font-semibold text-blue-200"
           placeholder="Nama Kamu "
         />
 
@@ -84,7 +94,7 @@ export default {
           name="review"
           id="review"
           placeholder="Review Kamu"
-          class="w-full bg-light border-red-200 border p-3 resize-y block overflow-hidden h-20 text-red-200 placeholder-red-200"
+          class="w-full bg-light border-blue-100 border p-3 resize-y block overflow-hidden h-20 text-blue-200 placeholder-blue-200"
         ></textarea>
       </div>
 
@@ -103,7 +113,7 @@ export default {
 
         <!-- access the input via $refs -->
         <button
-          class="w-full border-dashed border-2 py-5 border-red-100 text-red-100"
+          class="w-full border-dashed border-2 py-5 border-blue-100 text-blue-300"
           type="button"
           @click="upload.click()"
         >
@@ -123,23 +133,24 @@ export default {
     </div>
 
     <!-- bottom section -->
-    <button
-      type="submit"
-      class="py-3 bg-red-200 absolute bottom-0 right-0 w-full  left-0 text-light font-bold font-raleway"
-    >
-      <i
-        v-if="loading"
-        class="im im-rocket animate-bounce origin-center text-sm"
-      ></i>
-      <span v-else>POST</span>
-    </button>
+    <div class="mx-5 space-y-1">
+      <button
+        type="button"
+        @click="resetForm"
+        class="py-3 w-full focus:outline-none text-red-200"
+      >
+        RESET
+      </button>
+      <button
+        type="submit"
+        class="py-3 bg-blue-200 w-full left-0 text-light font-bold font-raleway"
+      >
+        <i
+          v-if="loading"
+          class="im im-rocket animate-bounce origin-center text-sm"
+        ></i>
+        <span v-else>POST</span>
+      </button>
+    </div>
   </form>
 </template>
-
-<style scoped>
-span[contenteditable]:empty::before {
-  content: 'Review Kamu';
-  color: rgb(120, 53, 15);
-  opacity: 0.6;
-}
-</style>

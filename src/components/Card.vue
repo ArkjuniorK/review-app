@@ -50,10 +50,10 @@ export default {
 </script>
 
 <template>
-  <div class="bg-red-50 w-full p-4 rounded-md relative">
+  <div class="bg-blue-0 w-full p-4 rounded-md relative">
     <div
       v-if="loading"
-      class="absolute top-0 flex justify-center items-center w-full h-full bg-red-200 left-0 rounded-md space-x-1 bg-opacity-90 text-light"
+      class="absolute top-0 flex justify-center items-center w-full h-full bg-blue-200 left-0 rounded-md space-x-1 bg-opacity-90 text-light"
     >
       <i class="im im-globe animate-bounce text-sm"></i>
       <span>Memuat...</span>
@@ -71,11 +71,11 @@ export default {
       <div id="right" class="w-full">
         <div id="top" class="flex justify-between items-start">
           <div>
-            <span class="font-raleway font-bold text-lg text-red-200 ">
+            <span class="font-raleway font-bold text-lg text-blue-300 ">
               {{ name }}
             </span>
             <span
-              class="font-lato block text-red-200 text-sm leading-none mb-3"
+              class="font-lato block text-blue-200 text-sm leading-none mb-3"
             >
               {{ newDate }}
             </span>
@@ -83,7 +83,7 @@ export default {
               :grade="rating"
               size="text-base"
               :max="5"
-              color="text-red-100"
+              color="text-blue-200"
             />
           </div>
           <div class="relative">
@@ -92,11 +92,11 @@ export default {
               @click="menu = !menu"
               class=" focus:outline-none"
             >
-              <i class="im im-menu-dot-h text-red-200 text-sm"></i>
+              <i class="im im-menu-dot-h text-blue-100 text-sm"></i>
             </button>
             <div
               v-if="menu"
-              class="bg-red-100 flex flex-col absolute right-0 p-2 rounded-b-md rounded-l-md text-left space-y-1 text-sm text-red-50"
+              class="bg-blue-200 flex flex-col absolute right-0 p-2 rounded-b-md rounded-l-md text-left space-y-1 text-sm text-red-50"
             >
               <button @click="gtReview(id)" class="focus:outline-none">
                 Edit

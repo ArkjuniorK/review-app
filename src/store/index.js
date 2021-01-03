@@ -1,5 +1,6 @@
 import { reactive, ref, provide, readonly, toRaw } from 'vue'
 import remove from 'lodash/remove'
+import reverse from 'lodash/reverse'
 import review from '../services'
 
 export const formContext = Symbol('Only Form')
@@ -71,7 +72,7 @@ const store = () => {
   async function getReviews() {
     try {
       const req = await review.index()
-      reviews.value = req.data.data
+      reviews.value = reverse(req.data.data) // reverse order
     } catch (err) {
       updateResponse('error', 'Gagal mendapatkan data')
     }
@@ -129,6 +130,7 @@ const store = () => {
   })
 
   provide(reviewContext, {
+    reviews,
     readreviews,
     getReviews,
     getReview,
