@@ -28,7 +28,7 @@ export default {
     const dates = new Date(props.date),
       newDate = dayjs(dates)
         .locale('id')
-        .format('dddd, Do MMMM YYYY')
+        .format('dddd, D MMMM YYYY')
 
     async function dlteReview(id) {
       menu.value = false

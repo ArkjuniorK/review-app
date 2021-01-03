@@ -13,7 +13,7 @@ export default {
     Card
   },
   setup() {
-    const { getReviews, readreviews, response, reviews } = store()
+    const { getReviews, readreviews, response } = store()
     const responseTitle = computed(() => {
       return response.error !== ''
         ? 'Error'
@@ -30,7 +30,6 @@ export default {
     })
 
     const loading = ref(false)
-    console.log(reviews)
 
     // mounted
     onMounted(async () => {
